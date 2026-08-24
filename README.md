@@ -29,6 +29,20 @@ In a real emergency, call your local emergency services directly.
 
 ---
 
+## Live demo
+
+Published on GitHub Pages: **<https://dondie52.github.io/medtechbw/>**
+
+`.github/workflows/deploy-pages.yml` builds the static export and publishes it on every push to
+`main`. Publishing needs one manual, one-time step this workflow cannot do for itself: in the repo's
+**Settings → Pages**, set **Source** to **GitHub Actions**. Until that is set, the workflow's build
+and upload succeed but there is nowhere configured to publish to.
+
+There is no server behind the live demo — see [Deploying to GitHub Pages](#deploying-to-github-pages)
+for what that changes about the architecture.
+
+---
+
 ## Install and run
 
 Requires Node.js 20 or later.
@@ -43,13 +57,54 @@ Then open <http://localhost:3000>.
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Development server |
-| `npm run build` | Production build |
-| `npm start` | Serve the production build |
+| `npm run build` | Static production build, written to `out/` |
+| `npm start` | Serve that static build locally at <http://localhost:3000> |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint via `next lint` |
 
 No API keys are needed. The map is a self-contained mock renderer — nothing in this repository
 requires a paid service to run locally, and no key may ever be committed.
+
+No `package-lock.json` is committed. This project was scaffolded in a sandboxed environment whose
+network policy blocked `registry.npmjs.org`, so a lockfile could never be generated there — `npm
+install` resolves fresh instead, here and in CI. Commit a lockfile the first time you run `npm
+install` somewhere with normal registry access, so builds become reproducible.
+
+---
+
+## Deploying to GitHub Pages
+
+The production build target is `output: 'export'` (`next.config.mjs`) — a directory of static HTML,
+CSS and JS with no server. That works cleanly here because nothing in this app needs one: every
+screen is client state (the `EmergencyProvider` context) or a demo data import, there are no API
+routes, and MedLink Botswana's philosophy is to keep every real integration behind an interface
+(`RealtimeTransport`, `EmergencyServiceIntegration`, `RouteEstimator`, `MapProvider`) rather than
+wired to a running backend.
+
+That constraint shaped one routing decision. The dispatcher's case detail screen is
+`/dispatch/emergencies/current`, not a dynamic `/dispatch/emergencies/[id]` route — a static export
+has to pre-render every path at build time, but this prototype's case IDs
+(`BW-ML-1028`, `BW-ML-1029`, …) increment with each new demo emergency and can't be known in
+advance. The page already reads its emergency from shared session state rather than from the URL, so
+dropping the dynamic segment cost nothing and removed a real "404 on the second demo run" bug.
+
+A GitHub Pages **project site** (as opposed to a user/org site) is served from
+`https://<owner>.github.io/<repo>/`, so the build needs a `/medtechbw` path prefix. That prefix is
+gated behind a `GITHUB_PAGES` environment variable in `next.config.mjs`, set only by the deploy
+workflow — local dev and a plain `npm run build` are never prefixed. `next/link` and the router apply
+the prefix automatically everywhere in the app; no component needs to know about it.
+
+`.github/workflows/deploy-pages.yml` builds and publishes on every push to `main` (and, for this
+prototype's convenience, to `claude/medlink-botswana-mvp-au46ta`). It adds a `.nojekyll` file to the
+output — GitHub Pages runs uploaded content through Jekyll by default, which silently drops the
+underscore-prefixed `_next` asset folder without it.
+
+The one thing the workflow cannot do for itself: a repository's Pages **Source** has to be set to
+**GitHub Actions** once, by a repo admin, under **Settings → Pages**. Until that is set, the workflow
+runs and uploads successfully but there is no configured destination to publish to.
+
+To deploy anywhere else that can serve a static directory (Netlify, Vercel, S3, Render, your own
+web server): run `npm run build`, then serve the `out/` folder. No `GITHUB_PAGES` env var, no prefix.
 
 ---
 
@@ -98,7 +153,7 @@ before the patient is told it landed), **Cancel emergency** (two-step confirmati
 | Route | Screen |
 | --- | --- |
 | `/dispatch` | Live emergencies: navigation, operational map, case panel |
-| `/dispatch/emergencies/[id]` | Full case with the authorised medical summary |
+| `/dispatch/emergencies/current` | Full case with the authorised medical summary |
 | `/dispatch/ambulances` | Fleet with live distance and ETA estimates |
 | `/dispatch/responders` | Verified non-ambulance responders |
 | `/dispatch/facilities` | Receiving facilities and their three statuses |

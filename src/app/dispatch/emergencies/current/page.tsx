@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { DEMO_DISPATCHER, DEMO_EMERGENCY_SUMMARY, DEMO_PATIENT_PROFILE } from '@/data';
 import { formatClock, formatElapsed, formatPhone } from '@/lib/format';
@@ -16,20 +15,25 @@ import {
 } from '@/components/emergency';
 
 /**
- * One emergency in full, including the role-authorised medical summary.
+ * The dispatcher's currently open emergency, in full, including the
+ * role-authorised medical summary.
+ *
+ * This route deliberately has no dynamic `[id]` segment. The prototype has no
+ * server to look a case up by ID against - it always shows whatever emergency
+ * is live in the shared session - and a static export has no server to
+ * generate an ID-keyed page on demand either, so a fixed URL is both the
+ * honest architecture and the one that works on GitHub Pages.
  *
  * Opening this page is itself an access event: the dispatcher is reading a
  * patient's medical information, so it is written to the audit log once per
  * visit and surfaced back to the patient under Activity.
  */
 export default function DispatchEmergencyDetailPage() {
-  const params = useParams<{ id: string }>();
   const { session, actions, assignedAmbulance, receivingFacility } = useEmergency();
   const nowMs = useNowMs(1000);
   const logged = useRef(false);
 
   const emergency = session.emergency;
-  const caseId = decodeURIComponent(params?.id ?? '');
 
   useEffect(() => {
     if (!emergency || logged.current) return;
@@ -47,9 +51,7 @@ export default function DispatchEmergencyDetailPage() {
         <Card className="p-6 text-center">
           <Icon name="info" size={32} className="mx-auto text-ink-subtle" />
           <h1 className="mt-3 text-xl font-bold text-ink">Emergency not available</h1>
-          <p className="mt-1.5 text-sm text-ink-muted">
-            {caseId ? `${caseId} is not open in this session.` : 'No emergency is open.'}
-          </p>
+          <p className="mt-1.5 text-sm text-ink-muted">No emergency is open in this session.</p>
           <Link
             href="/dispatch"
             className="mt-4 inline-block text-sm font-semibold text-brand underline underline-offset-2"

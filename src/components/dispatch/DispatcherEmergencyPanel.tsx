@@ -218,7 +218,7 @@ export function DispatcherEmergencyPanel() {
         )}
 
         <Link
-          href={`/dispatch/emergencies/${encodeURIComponent(emergency.id)}`}
+          href="/dispatch/emergencies/current"
           className="flex min-h-touch items-center justify-center gap-2 rounded-control text-sm font-bold uppercase tracking-wide text-brand hover:bg-brand-50"
         >
           <Icon name="medical-profile" size={18} />
