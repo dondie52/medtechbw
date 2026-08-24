@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+# Builds the static export and publishes it to GitHub Pages.
+#
+# One-time manual step this workflow cannot do for itself: in the repo's
+# Settings -> Pages, set Source to "GitHub Actions". Until that is set, the
+# deploy job's upload succeeds but there is nowhere configured to publish it.
+on:
+  push:
+    branches:
+      - main
+      - claude/medlink-botswana-mvp-au46ta
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment runs at a time; a new push supersedes an in-flight
+# one rather than queuing behind it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # No package-lock.json is committed (see README) - the registry was not
+      # reachable in the environment this project was scaffolded in. `npm
+      # install` resolves fresh here in the Actions runner, which has normal
+      # internet access.
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build static export
+        env:
+          GITHUB_PAGES: 'true'
+        run: npm run build
+
+      # GitHub Pages runs uploaded content through Jekyll by default, which
+      # ignores the underscore-prefixed _next asset folder. This opts out.
+      - name: Disable Jekyll processing
+        run: touch ./out/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

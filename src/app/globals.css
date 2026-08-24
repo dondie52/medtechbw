@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Token mirror. Tailwind owns the source of truth (tailwind.config.ts); these
+ * custom properties exist so SVG fills and inline styles can reach the same
+ * values instead of re-declaring hex codes per screen.
+ */
+:root {
+  --brand: #00478d;
+  --brand-deep: #003164;
+  --brand-600: #005eb8;
+  --brand-100: #d6e3ff;
+  --emergency: #ba1a1a;
+  --emergency-deep: #93000a;
+  --emergency-container: #ffdad6;
+  --success: #1b6d24;
+  --success-container: #a3f69c;
+  --caution: #8a5a00;
+  --caution-accent: #e9a319;
+  --caution-container: #ffdea6;
+  --surface-app: #f9f9ff;
+  --surface: #ffffff;
+  --surface-low: #f2f3fb;
+  --surface-high: #e7e8ee;
+  --ink: #191c20;
+  --ink-muted: #424751;
+  --ink-subtle: #737782;
+  --line: #e2e2e9;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface-app text-ink font-sans antialiased;
+  }
+
+  /* A visible focus ring everywhere, never removed. */
+  :focus-visible {
+    @apply outline-none ring-4 ring-brand-600/50 ring-offset-2 ring-offset-white;
+  }
+
+  /* On red or dark surfaces the blue ring disappears; switch to white there. */
+  .on-emergency :focus-visible,
+  .on-inverse :focus-visible {
+    @apply ring-white/85 ring-offset-transparent;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply text-balance;
+  }
+}
+
+@layer utilities {
+  /* Respects iOS home-indicator / notch insets on the patient app. */
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .pt-safe {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+}
+
+/*
+ * Reduced motion: SOS ripples, transmission pulses and marker animation all
+ * stop. No state depends on animation alone - the hold ring also reports a
+ * numeric aria-valuenow and every state carries a text label.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
