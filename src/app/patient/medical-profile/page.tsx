@@ -24,7 +24,7 @@ export default function MedicalProfilePage() {
     <div id="main" className="space-y-4 py-1">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-ink">Medical profile</h1>
-        <Button variant="primary" size="sm" icon="download" onClick={() => window.print()}>
+        <Button variant="primary" size="sm" icon="document" onClick={() => window.print()}>
           Print
         </Button>
       </div>
@@ -69,7 +69,7 @@ export default function MedicalProfilePage() {
                   <button
                     type="button"
                     onClick={() => setOmangVisible((visible) => !visible)}
-                    className="inline-flex items-center gap-1 rounded-control px-2 py-1 text-xs font-semibold text-brand hover:bg-brand-50"
+                    className="inline-flex min-h-touch items-center gap-1 rounded-control px-2.5 text-xs font-semibold text-brand hover:bg-brand-50"
                   >
                     <Icon name="eye" size={14} />
                     {omangVisible ? 'Hide' : 'Show'}

@@ -30,18 +30,24 @@ export function PatientShell({ children }: { children: ReactNode }) {
             <MedLinkLogo size={30} />
           </Link>
           <div className="flex items-center gap-3">
-            <ConnectivityDot className="hidden xs:inline-flex" />
-            <button
-              type="button"
-              aria-label="Notifications"
+            <ConnectivityDot />
+            <Link
+              href="/patient/activity"
+              aria-label={
+                session.accessLog.length > 0
+                  ? `Activity. ${session.accessLog.length} unread.`
+                  : 'Activity'
+              }
               className="relative flex h-touch w-touch items-center justify-center rounded-pill text-ink-muted hover:bg-surface-container"
             >
               <Icon name="bell" size={22} />
-              <span
-                aria-hidden
-                className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-emergency ring-2 ring-white"
-              />
-            </button>
+              {session.accessLog.length > 0 ? (
+                <span
+                  aria-hidden
+                  className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-emergency ring-2 ring-white"
+                />
+              ) : null}
+            </Link>
           </div>
         </div>
 

@@ -107,11 +107,13 @@ export function MapContainer({
       {unavailable ? (
         fallback
       ) : (
-        <MapErrorBoundary fallback={fallback}>
-          <Provider entities={entities} route={route} ariaLabel={ariaLabel} className="h-full w-full" />
-        </MapErrorBoundary>
+        <>
+          <MapErrorBoundary fallback={fallback}>
+            <Provider entities={entities} route={route} ariaLabel={ariaLabel} className="h-full w-full" />
+          </MapErrorBoundary>
+          {children}
+        </>
       )}
-      {children}
     </div>
   );
 }

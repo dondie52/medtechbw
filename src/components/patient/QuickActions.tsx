@@ -28,10 +28,10 @@ export function QuickActions({ actions }: { actions: QuickAction[] }) {
               <Icon name={action.icon} size={22} />
             </span>
             <span className="mt-auto">
-              <span className="block text-[15px] font-bold leading-tight text-ink">
+              <span className="line-clamp-2 text-[15px] font-bold leading-tight text-ink">
                 {action.title}
               </span>
-              <span className="mt-0.5 block text-xs leading-snug text-ink-muted">
+              <span className="mt-0.5 line-clamp-2 text-xs leading-snug text-ink-muted">
                 {action.detail}
               </span>
             </span>

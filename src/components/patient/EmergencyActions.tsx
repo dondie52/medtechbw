@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { DEMO_DISPATCH_LINE, DEMO_PATIENT_PROFILE } from '@/data';
-import { telHref } from '@/lib/format';
+import { formatPhone, telHref } from '@/lib/format';
 import { useEmergency } from '@/features/emergency';
 import { canPatientCancel } from '@/features/emergency/states';
 import { Button, Card, Icon, Switch, buttonClasses } from '@/components/ui';
@@ -38,6 +38,10 @@ export function EmergencyActions() {
         <Icon name="call" size={22} />
         Call dispatch
       </a>
+      {/* If the device has no dialler (e.g. a demo running on a desktop
+          browser), the tel: link is inert - so the number is always visible
+          as plain text too. */}
+      <p className="-mt-1 text-center text-xs text-ink-subtle">{formatPhone(DEMO_DISPATCH_LINE)}</p>
 
       {primaryContact ? (
         <a
