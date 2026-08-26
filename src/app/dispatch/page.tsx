@@ -93,7 +93,7 @@ export default function DispatchDashboardPage() {
   }, [entities, query]);
 
   return (
-    <div className="flex h-full min-h-dvh flex-col xl:flex-row">
+    <div className="flex h-full min-h-dvh flex-col lg:flex-row">
       <section aria-label="Operational map" className="relative min-h-[420px] flex-1 p-4 lg:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -137,7 +137,7 @@ export default function DispatchDashboardPage() {
 
       <aside
         aria-label="Selected emergency"
-        className="w-full shrink-0 border-t border-line bg-surface xl:h-dvh xl:w-[400px] xl:border-l xl:border-t-0"
+        className="w-full shrink-0 border-t border-line bg-surface lg:h-dvh lg:w-[360px] lg:border-l lg:border-t-0 xl:w-[400px]"
       >
         <DispatcherEmergencyPanel />
       </aside>

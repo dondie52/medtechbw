@@ -165,12 +165,22 @@ export function MockMapCanvas({ entities, route, ariaLabel, className }: MapProv
         ))}
       </svg>
 
-      {/* Marker labels in HTML so they stay legible at any canvas size */}
+      {/* Marker labels in HTML so they stay legible at any canvas size. Capped
+          in width so a long facility name truncates with an ellipsis instead
+          of overflowing, and anchored off the marker's edge (rather than
+          centred) once it's close enough to the frame that a centred label
+          would clip - the full name is always in the sr-only list below. */}
       <div className="pointer-events-none absolute inset-0">
         {placed.map(({ entity, point }) => (
           <span
             key={entity.id}
-            className="absolute -translate-x-1/2 translate-y-2 whitespace-nowrap rounded-control bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-ink shadow-card"
+            title={entity.label}
+            className={cn(
+              'absolute max-w-[112px] truncate rounded-control bg-white/95 px-2 py-0.5',
+              'text-[11px] font-semibold text-ink shadow-card',
+              point.x < 15 ? 'translate-x-0' : point.x > 85 ? '-translate-x-full' : '-translate-x-1/2',
+              point.y > 88 ? '-translate-y-[calc(100%+8px)]' : 'translate-y-2',
+            )}
             style={{ left: `${point.x}%`, top: `${point.y}%` }}
           >
             {entity.label}

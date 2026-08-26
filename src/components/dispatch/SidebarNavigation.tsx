@@ -49,7 +49,7 @@ export function SidebarNavigation({ items }: { items: DispatchNavItem[] }) {
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-[44px] items-center gap-3 rounded-pill px-4 text-sm font-semibold transition-colors',
+                  'flex min-h-touch items-center gap-3 rounded-pill px-4 text-sm font-semibold transition-colors',
                   active
                     ? 'bg-brand text-white'
                     : 'text-ink-muted hover:bg-brand-50 hover:text-brand',
@@ -67,7 +67,16 @@ export function SidebarNavigation({ items }: { items: DispatchNavItem[] }) {
                     {item.count}
                   </span>
                 ) : null}
-                {!item.implemented ? <span className="sr-only">(not built yet)</span> : null}
+                {!item.implemented ? (
+                  <span
+                    className={cn(
+                      'ml-auto shrink-0 rounded-pill px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide',
+                      active ? 'bg-white/20 text-white' : 'bg-surface-container text-ink-subtle',
+                    )}
+                  >
+                    Not built
+                  </span>
+                ) : null}
               </Link>
             </li>
           );

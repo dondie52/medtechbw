@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { DEMO_DISPATCHER, DEMO_PATIENT_PROFILE } from '@/data';
 import { formatClock, formatElapsed, formatPhone, telHref } from '@/lib/format';
 import { useEmergency, useNowMs } from '@/features/emergency';
-import { STATE_PRESENTATION } from '@/features/emergency/states';
+import { STATE_PRESENTATION, canTransition } from '@/features/emergency/states';
 import { GENDER_LABEL, formatLandmarkLine, formatLocationLine } from '@/types';
 import { Avatar, Button, Card, CardHeading, Icon, StatusPill } from '@/components/ui';
 import { EmergencyStatusBadge, KnownVsCurrentPanel } from '@/components/emergency';
@@ -48,6 +48,12 @@ export function DispatcherEmergencyPanel() {
   }
 
   const accepted = emergency.acceptedBy !== null;
+  /* Reassigning a response unit isn't a modelled transition once one has
+   * already been assigned - the reducer would silently drop the event, so
+   * the control that would trigger it is disabled instead of pretending to
+   * work. */
+  const canAssignResponse =
+    session.state === 'assigning_response' || canTransition(session.state, 'assigning_response');
   const cannotSpeak = emergency.communicationFlags.find(
     (flag) => flag.code === 'patient_may_be_unable_to_speak',
   );
@@ -111,7 +117,7 @@ export function DispatcherEmergencyPanel() {
         <KnownVsCurrentPanel
           conditions={profile.chronicConditions}
           emergency={emergency}
-          className="sm:grid-cols-1"
+          columns={1}
         />
 
         {cannotSpeak ? (
@@ -204,6 +210,8 @@ export function DispatcherEmergencyPanel() {
             <Button
               variant="secondary"
               size="md"
+              disabled={!canAssignResponse}
+              title={canAssignResponse ? undefined : 'A response unit is already assigned'}
               onClick={() => {
                 actions.startAssignment();
                 setAssignOpen(true);

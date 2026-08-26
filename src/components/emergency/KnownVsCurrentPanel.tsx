@@ -15,10 +15,14 @@ import { Card, CardHeading, Icon, StatusPill } from '@/components/ui';
 export function KnownVsCurrentPanel({
   conditions,
   emergency,
+  /** Two columns from `sm` up by default; pass `1` where the panel sits in a
+   * narrow sidebar rather than the full page width. */
+  columns = 2,
   className,
 }: {
   conditions: ChronicCondition[];
   emergency: Emergency;
+  columns?: 1 | 2;
   className?: string;
 }) {
   const primary = conditions.find((condition) => condition.severity === 'primary');
@@ -26,7 +30,7 @@ export function KnownVsCurrentPanel({
   const symptoms = emergency.symptomsReported;
 
   return (
-    <div className={cn('grid gap-3 sm:grid-cols-2', className)}>
+    <div className={cn('grid gap-3', columns === 2 ? 'sm:grid-cols-2' : 'grid-cols-1', className)}>
       <Card tone="brand" className="p-4">
         <CardHeading tone="brand" icon="medical-profile" eyebrow>
           Known medical profile

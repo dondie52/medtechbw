@@ -46,7 +46,7 @@ export function PatientLocationCard({
           onClick={onUpdate}
           className="min-h-touch shrink-0 rounded-control px-2 text-[15px] font-bold text-brand hover:bg-brand-50"
         >
-          Update
+          View
         </button>
       ) : null}
     </Card>

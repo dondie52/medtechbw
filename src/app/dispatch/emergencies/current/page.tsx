@@ -68,7 +68,7 @@ export default function DispatchEmergencyDetailPage() {
       <div>
         <Link
           href="/dispatch"
-          className="inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-brand"
+          className="inline-flex min-h-touch items-center gap-2 text-sm font-semibold text-brand"
         >
           <Icon name="arrow-back" size={18} />
           Live emergencies
