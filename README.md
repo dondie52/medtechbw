@@ -62,8 +62,9 @@ Then open <http://localhost:3000>.
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint via `next lint` |
 
-No API keys are needed. The map is a self-contained mock renderer — nothing in this repository
-requires a paid service to run locally, and no key may ever be committed.
+No API keys are needed anywhere. The map renders real OpenStreetMap tiles via Leaflet (loaded from a
+CDN at runtime, not an npm dependency) — a free, keyless service. It is the one part of this app that
+needs a live network connection; every other screen runs entirely on local demo data.
 
 No `package-lock.json` is committed. This project was scaffolded in a sandboxed environment whose
 network policy blocked `registry.npmjs.org`, so a lockfile could never be generated there — `npm
@@ -225,13 +226,17 @@ Every implementation declares `isLiveService`, which is `false` here.
 
 ### Map
 
-`MapProvider` is a one-component interface. The shipped `mockMapProvider` draws a schematic Gaborone
-canvas in SVG with `requiresApiKey: false`. Swapping in MapLibre with OpenStreetMap tiles, or a
-commercial provider, means implementing the same prop shape.
+`MapProvider` is a one-component interface. The default, `liveMapProvider` (`LiveMapCanvas`), draws
+real OpenStreetMap tiles through Leaflet, loaded from a CDN at runtime so the map costs nothing and
+needs no key. The original schematic renderer, `mockMapProvider` (`MockMapCanvas`), is kept and still
+exported for anywhere a live tile fetch is undesirable — offline development, tests, a future "lite
+mode." Swapping in a commercial provider means implementing the same prop shape.
 
 Maps are treated as **secondary to emergency transmission** throughout. A map failure is caught by an
 error boundary and replaced with a panel that lists the same entities as text and says plainly:
-*"This does not affect your emergency."*
+*"This does not affect your emergency."* `LiveMapCanvas` applies the same principle to a slow or failed
+CDN load: a loading state while the library fetches, then the same reassuring fallback if it never
+arrives.
 
 ### Mock data
 
@@ -321,7 +326,8 @@ visually-hidden word); `prefers-reduced-motion` honoured; zoom never blocked.
 
 The SOS button works with mouse, touch and keyboard, reports progress as `aria-valuenow` as well as
 visually, announces start/completion/early release through a live region, and vibrates where supported.
-The schematic map is unreadable to a screen reader, so it always renders a text list of the same entities.
+Neither map provider is readable by a screen reader, so both always render a text list of the same
+entities alongside the map.
 
 ---
 
@@ -333,7 +339,7 @@ The schematic map is unreadable to a screen reader, so it always renders a text 
 | Dispatch backend | `features/emergency/dispatch-service.ts` | Real dispatch API |
 | Session snapshot | `readSnapshot` / `writeSnapshot` | Fetch of the current case |
 | Travel estimates | `lib/geo.ts` → `RouteEstimator` | OSRM, Valhalla or a commercial router |
-| Map rendering | `components/map/map-types.ts` → `MapProvider` | MapLibre + OpenStreetMap tiles |
+| Map rendering | `components/map/map-types.ts` → `MapProvider` | Done: `LiveMapCanvas` (Leaflet + OSM). A commercial provider is a further swap of the same interface |
 | Patient and fleet data | `src/data/*` | Authenticated API reads |
 | Access log | `EmergencyDataAccessLog` | Append-only server-side audit store |
 | Authentication | `DEMO_DISPATCHER` and friends | Real sessions with role claims |
@@ -348,7 +354,7 @@ The schematic map is unreadable to a screen reader, so it always renders a text 
    and the natural place for symptoms to first be recorded by someone who can see the patient.
 3. **Setswana.** The scaffolding is in `lib/i18n.ts`; the translation needs a fluent speaker and
    clinical review. Emergency wording is not something to machine-translate.
-4. **Real map tiles** behind the existing `MapProvider` interface.
+4. ~~Real map tiles behind the existing `MapProvider` interface.~~ Done — see [Map](#map).
 5. **Multiple concurrent emergencies.** The state machine handles one case; the dispatcher console's
    queue, prioritisation and assignment conflicts all follow from supporting many.
 6. **Offline queueing.** The connectivity model is honest about being offline but does not yet queue

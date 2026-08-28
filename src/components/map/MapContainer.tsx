@@ -3,14 +3,25 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 import { Icon } from '@/components/ui';
+import { LiveMapCanvas } from './LiveMapCanvas';
 import { MockMapCanvas } from './MockMapCanvas';
 import { ENTITY_LABEL, type MapEntity, type MapProvider, type MapRoute } from './map-types';
 
 /**
- * The only map provider wired up today.
- *
- * `requiresApiKey: false` is enforced by choice, not by accident: the app must
- * run locally with no credentials, and no key may ever be committed.
+ * Real OpenStreetMap tiles via Leaflet - the default provider everywhere in
+ * the app, so a demo shows an actual pannable map of Gaborone rather than a
+ * schematic. No API key: OSM's tile service and the Leaflet library (loaded
+ * from a CDN) are both free and keyless.
+ */
+export const liveMapProvider: MapProvider = {
+  name: 'OpenStreetMap (Leaflet)',
+  Component: LiveMapCanvas,
+  requiresApiKey: false,
+};
+
+/**
+ * Schematic fallback, kept for anywhere a real network tile fetch is
+ * undesirable (offline development, tests, or a future explicit "lite mode").
  */
 export const mockMapProvider: MapProvider = {
   name: 'MedLink schematic (mock)',
@@ -94,7 +105,7 @@ export function MapContainer({
   route = null,
   ariaLabel,
   className,
-  provider = mockMapProvider,
+  provider = liveMapProvider,
   unavailable,
   unavailableReason = 'The map could not be loaded.',
   children,

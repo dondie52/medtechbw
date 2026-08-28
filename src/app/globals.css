@@ -72,6 +72,44 @@
  * stop. No state depends on animation alone - the hold ring also reports a
  * numeric aria-valuenow and every state carries a text label.
  */
+/*
+ * Leaflet's stylesheet loads from a CDN at runtime (see LiveMapCanvas), so it
+ * cannot be reached by Tailwind. These overrides fold the library's default
+ * chrome into the MedLink look; `!important` guards against load order,
+ * since the CDN stylesheet is not guaranteed to land before this one.
+ */
+.medlink-map-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.medlink-map-tooltip {
+  border: none !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  padding: 2px 10px !important;
+  font-family: var(--font-inter), Inter, system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  box-shadow: 0 1px 2px rgba(25, 28, 32, 0.16) !important;
+}
+.medlink-map-tooltip::before {
+  display: none !important;
+}
+
+.leaflet-container {
+  font-family: var(--font-inter), Inter, system-ui, sans-serif !important;
+  background: #eef1f6 !important;
+}
+.leaflet-control-zoom a {
+  border-radius: 8px !important;
+}
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.85) !important;
+  font-size: 10px !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
